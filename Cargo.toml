@@ -16,6 +16,13 @@ doc = false
 [dependencies]
 anyhow = "1.0.71"
 async-trait = "0.1.68"
+cairo-lang-compiler = "=2.0.0-rc4"
+cairo-lang-diagnostics = "=2.0.0-rc4"
+cairo-lang-filesystem = "=2.0.0-rc4"
+cairo-lang-parser = "=2.0.0-rc4"
+cairo-lang-starknet = "=2.0.0-rc4"
+cairo-lang-syntax = "=2.0.0-rc4"
+cairo-lang-utils = "=2.0.0-rc4"
 clap = { version = "4.3.5", features = ["derive"] }
 dotenv = "0.15.0"
 tokio = { version = "1.28.2", features = ["full"] }
