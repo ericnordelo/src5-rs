@@ -3,6 +3,7 @@ use cairo_lang_compiler::db::RootDatabase;
 use cairo_lang_syntax::node::kind::SyntaxKind;
 use cairo_lang_syntax::node::SyntaxNode;
 
+use super::ast::get_syntax_tree;
 use super::utils::find_children;
 
 #[derive(Debug)]
@@ -12,15 +13,21 @@ pub struct CairoStruct {
     pub members_types: Vec<SyntaxNode>,
 }
 
-pub fn get_corelib_structs() -> [CairoStruct; 1] {
-    [CairoStruct {
-        name: "Span".into(),
-        generics: vec!["T".into()],
-        members_types: vec![], // TODO: Add members types syntax node
-    }]
+pub fn get_corelib_structs(db: &RootDatabase) -> Vec<CairoStruct> {
+    // Get the syntax tree
+    let tree = get_syntax_tree(db, CORELIB_STRUCTS.into());
+
+    get_cairo_structs_no_corelib(db, &tree)
 }
 
 pub fn get_cairo_structs(db: &RootDatabase, syntax_tree: &SyntaxNode) -> Vec<CairoStruct> {
+    let mut cairo_structs = get_cairo_structs_no_corelib(db, syntax_tree);
+    // Include corelib structs
+    cairo_structs.extend(get_corelib_structs(db));
+    cairo_structs
+}
+
+pub fn get_cairo_structs_no_corelib(db: &RootDatabase, syntax_tree: &SyntaxNode) -> Vec<CairoStruct> {
     let mut cairo_structs = Vec::new();
     for node in syntax_tree.descendants(db) {
         if SyntaxKind::ItemStruct == node.kind(db) {
@@ -53,7 +60,11 @@ pub fn get_cairo_structs(db: &RootDatabase, syntax_tree: &SyntaxNode) -> Vec<Cai
             });
         }
     }
-    // Include corelib structs
-    cairo_structs.extend(get_corelib_structs());
     cairo_structs
 }
+
+const CORELIB_STRUCTS: &str = "
+struct Span<T> {
+   snapshot: @Array<T>
+}
+";

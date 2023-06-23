@@ -12,15 +12,6 @@ struct Call2<T> {
     to: Span<T>,
 }
 
-struct Span<T> {
-    snaphost: @Array<T>
-}
-
-enum bool {
-    True: (),
-    False: ()
-}
-
 enum Call3<T> {
     faa: bool,
     fee: Span<T>,
