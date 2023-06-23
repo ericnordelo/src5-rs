@@ -1649,7 +1649,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "src5"
+name = "src5-rs"
 version = "0.1.0"
 dependencies = [
  "anyhow",

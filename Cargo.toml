@@ -1,16 +1,16 @@
 [package]
-name = "src5"
+name = "src5-rs"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-name = "src5"
-path = "src/src5/lib.rs"
+name = "src5_rs"
+path = "src/src5_rs/lib.rs"
 
 [[bin]]
-name = "src5"
+name = "src5_rs"
 doc = false
 
 [dependencies]
