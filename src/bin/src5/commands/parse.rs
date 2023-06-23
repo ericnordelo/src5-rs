@@ -33,6 +33,7 @@ impl CliCommand for Parse {
         let cairo_structs = get_cairo_structs(&db, &tree);
         let cairo_enums = get_cairo_enums(&db, &tree);
 
+        println!();
         let mut trait_table = Table::new();
         trait_table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
         trait_table
