@@ -2,8 +2,9 @@ use anyhow::{Ok, Result};
 use async_trait::async_trait;
 use cairo_lang_syntax::node::kind::SyntaxKind;
 use clap::Parser;
-use src5::parser::cairo_struct::get_cairo_structs;
 use src5::parser::ast::get_database_with_starknet_plugin;
+use src5::parser::cairo_enum::get_cairo_enums;
+use src5::parser::cairo_struct::get_cairo_structs;
 // use src5::parser::cairo_trait::get_non_generic_traits;
 use src5::parser::ast::get_syntax_tree;
 use src5::parser::cairo_trait::get_non_generic_traits;
@@ -34,17 +35,30 @@ impl CliCommand for Parse {
         // for node in tree.descendants(&db) {
         //     // println!("{}", node.kind(&db));
         //     match node.kind(&db) {
-        //         SyntaxKind::ReturnTypeClause => {
+        //         SyntaxKind::ExprList => {
         //             println!();
         //             for node2 in node.children(&db) {
-        //                 println!("{} - {}", node2.kind(&db), node2.get_text_without_trivia(&db));
+        //                 println!(
+        //                     "{} - {}",
+        //                     node2.kind(&db),
+        //                     node2.get_text_without_trivia(&db)
+        //                 );
         //             }
         //         }
         //         _ => {}
         //     }
         // }
 
-        println!("{:?}", get_non_generic_traits(&db, &tree));
+        let traits = get_non_generic_traits(&db, &tree);
+        let cairo_structs = get_cairo_structs(&db, &tree);
+        let cairo_enums = get_cairo_enums(&db, &tree);
+
+        for function in &traits[0].functions {
+            println!(
+                "{}",
+                function.get_efs_signature(&db, &cairo_structs, &cairo_enums)
+            );
+        }
         Ok(())
     }
 }

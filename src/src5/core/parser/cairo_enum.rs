@@ -1,4 +1,4 @@
-// Module for handling Cairo structs
+// Module for handling Cairo enums
 use cairo_lang_compiler::db::RootDatabase;
 use cairo_lang_syntax::node::kind::SyntaxKind;
 use cairo_lang_syntax::node::SyntaxNode;
@@ -6,38 +6,38 @@ use cairo_lang_syntax::node::SyntaxNode;
 use super::utils::find_children;
 
 #[derive(Debug)]
-pub struct CairoStruct {
+pub struct CairoEnum {
     pub name: String,
     pub generics: Vec<String>,
-    pub members_types: Vec<SyntaxNode>,
+    pub variants_types: Vec<SyntaxNode>,
 }
 
-pub fn get_corelib_structs() -> [CairoStruct; 1] {
-    [CairoStruct {
-        name: "Span".into(),
-        generics: vec!["T".into()],
-        members_types: vec![], // TODO: Add members types syntax node
+pub fn get_corelib_enums() -> [CairoEnum; 1] {
+    [CairoEnum {
+        name: "bool".into(),
+        generics: vec![],
+        variants_types: vec![], // TODO: Add variant types syntax node
     }]
 }
 
-pub fn get_cairo_structs(db: &RootDatabase, syntax_tree: &SyntaxNode) -> Vec<CairoStruct> {
-    let mut cairo_structs = Vec::new();
+pub fn get_cairo_enums(db: &RootDatabase, syntax_tree: &SyntaxNode) -> Vec<CairoEnum> {
+    let mut cairo_enums = Vec::new();
     for node in syntax_tree.descendants(db) {
-        if SyntaxKind::ItemStruct == node.kind(db) {
-            // Look up the Struct name
+        if SyntaxKind::ItemEnum == node.kind(db) {
+            // Look up the Enum name
             let id_node = find_children(db, &node, SyntaxKind::TerminalIdentifier).unwrap();
             let struct_name = id_node.get_text_without_trivia(db);
             let mut struct_members_types = Vec::new();
             let mut struct_generics = Vec::new();
 
-            // Look up the Struct members types
+            // Look up the Enum variants types
             let members_node = find_children(db, &node, SyntaxKind::MemberList).unwrap();
             for node in members_node.descendants(db) {
                 if node.kind(db) == SyntaxKind::TypeClause {
                     struct_members_types.push(node);
                 }
             }
-            // Look up the Struct generics
+            // Look up the Enum generics
             if let Some(child) = find_children(db, &node, SyntaxKind::WrappedGenericParamList) {
                 for node in child.descendants(db) {
                     if node.kind(db) == SyntaxKind::GenericParamType {
@@ -46,14 +46,14 @@ pub fn get_cairo_structs(db: &RootDatabase, syntax_tree: &SyntaxNode) -> Vec<Cai
                     }
                 }
             }
-            cairo_structs.push(CairoStruct {
+            cairo_enums.push(CairoEnum {
                 name: struct_name,
                 generics: struct_generics,
-                members_types: struct_members_types,
+                variants_types: struct_members_types,
             });
         }
     }
     // Include corelib structs
-    cairo_structs.extend(get_corelib_structs());
-    cairo_structs
+    cairo_enums.extend(get_corelib_enums());
+    cairo_enums
 }

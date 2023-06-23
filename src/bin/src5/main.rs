@@ -15,12 +15,10 @@ async fn main() -> Result<()> {
     dotenv().ok();
 
     let cli = Cli::parse();
-
     match cli.command {
         cli::Commands::Parse(cmd) => {
             cmd.run().await?;
         }
     };
-
     Ok(())
 }

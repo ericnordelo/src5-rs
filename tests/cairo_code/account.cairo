@@ -9,9 +9,22 @@ struct Call {
 }
 
 struct Call2<T> {
-    to: ContractAddress,
-    selector: felt252,
-    calldata: Array<T>
+    to: Span<T>,
+}
+
+struct Span<T> {
+    snaphost: @Array<T>
+}
+
+enum bool {
+    True: (felt252,@felt252),
+    False: ()
+}
+
+enum Call3<T> {
+    faa: bool,
+    fee: Span<T>,
+    foo: T,
 }
 
 trait IAccount {
