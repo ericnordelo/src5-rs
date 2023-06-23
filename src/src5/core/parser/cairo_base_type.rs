@@ -32,10 +32,7 @@ pub fn get_cairo_base_types() -> [CairoBaseType; 5] {
 }
 
 pub fn get_cairo_base_type_from_name(name: &str) -> Option<CairoBaseType> {
-    for base_type in get_cairo_base_types() {
-        if base_type.name == name {
-            return Some(base_type);
-        }
-    }
-    None
+    get_cairo_base_types()
+        .into_iter()
+        .find(|base_type| base_type.name == name)
 }

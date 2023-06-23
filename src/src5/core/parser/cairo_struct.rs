@@ -27,7 +27,10 @@ pub fn get_cairo_structs(db: &RootDatabase, syntax_tree: &SyntaxNode) -> Vec<Cai
     cairo_structs
 }
 
-pub fn get_cairo_structs_no_corelib(db: &RootDatabase, syntax_tree: &SyntaxNode) -> Vec<CairoStruct> {
+pub fn get_cairo_structs_no_corelib(
+    db: &RootDatabase,
+    syntax_tree: &SyntaxNode,
+) -> Vec<CairoStruct> {
     let mut cairo_structs = Vec::new();
     for node in syntax_tree.descendants(db) {
         if SyntaxKind::ItemStruct == node.kind(db) {

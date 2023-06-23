@@ -32,17 +32,17 @@ impl CairoNonGenericFunction {
     pub fn get_efs_signature(
         &self,
         db: &RootDatabase,
-        cairo_structs: &Vec<CairoStruct>,
-        cairo_enums: &Vec<CairoEnum>,
+        cairo_structs: &[CairoStruct],
+        cairo_enums: &[CairoEnum],
     ) -> String {
         let mut efs_signature = format!("{}(", self.name);
         // Resolve each member type
         for input in self.inputs_types.iter() {
             efs_signature.push_str(&input.get_src5_type(db, cairo_structs, cairo_enums));
-            efs_signature.push_str(",");
+            efs_signature.push(',');
         }
         efs_signature.pop(); // Remove last comma
-        efs_signature.push_str(")");
+        efs_signature.push(')');
 
         // Resolve return type
         if let Some(return_type) = &self.return_type {
@@ -59,7 +59,7 @@ pub fn get_functions_from_trait_body(
 ) -> Vec<CairoNonGenericFunction> {
     let mut functions = Vec::new();
 
-    let trait_items = find_children(db, &trait_body, SyntaxKind::TraitItemList).unwrap();
+    let trait_items = find_children(db, trait_body, SyntaxKind::TraitItemList).unwrap();
     for node in trait_items.children(db) {
         if node.kind(db) == SyntaxKind::TraitItemFunction {
             // Look up the Function name

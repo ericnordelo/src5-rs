@@ -21,9 +21,7 @@ pub fn get_non_generic_traits(
     for node in syntax_tree.descendants(db) {
         if SyntaxKind::ItemTrait == node.kind(db) {
             // Check if has no generic types
-            if let Some(_) =
-                find_children(db, &node, SyntaxKind::OptionWrappedGenericParamListEmpty)
-            {
+            if find_children(db, &node, SyntaxKind::OptionWrappedGenericParamListEmpty).is_some() {
                 // Look up the Trait name
                 let id_node = find_children(db, &node, SyntaxKind::TerminalIdentifier).unwrap();
                 let trait_name = id_node.get_text_without_trivia(db);
