@@ -1,9 +1,14 @@
 [package]
 name = "src5-rs"
+description = "Utility for generating SRC5 interfaces ids from Cairo traits"
+homepage = "https://github.com/ericnordelo/src5-rs"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/ericnordelo/src5-rs"
+keywords = ["cairo", "interface", "src5", "erc165", "introspection"]
+categories = ["command-line-utilities"]
 
 [lib]
 name = "src5_rs"
