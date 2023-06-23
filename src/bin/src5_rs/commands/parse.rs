@@ -39,18 +39,16 @@ impl CliCommand for Parse {
         trait_table
             .set_titles(row![bFg->"SRC5 Function Signature:", bFg->"Extended Function Selector:"]);
 
-        let mut interface_id = BigUint::from(0u8);
         for (i, cairo_trait) in traits.iter().enumerate() {
             if i > 0 {
                 trait_table.add_empty_row();
-            } else {
-                interface_id = BigUint::from(0u8);
             }
+            let mut interface_id = BigUint::from(0u8);
             trait_table.add_row(row![bFg->cairo_trait.name]);
             for function in &cairo_trait.functions {
                 let signature = function.get_efs_signature(&db, &cairo_structs, &cairo_enums);
                 let selector = get_selector_from_signature(&signature);
-                interface_id ^= &selector;
+                interface_id ^= selector.clone();
                 trait_table.add_row(row![signature, format!("0x{:x}", selector)]);
             }
             trait_table.add_row(row![bFg->format!("Id: 0x{:x}", interface_id)]);

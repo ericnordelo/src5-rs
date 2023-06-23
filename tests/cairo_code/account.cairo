@@ -13,3 +13,9 @@ trait IAccount {
     fn is_valid_signature(message: felt252, signature: Array<felt252>) -> u32;
     fn supports_interface(interface_id: u32) -> bool;
 }
+
+trait Sergio {
+    fn __execute__(calls: Array<Call>) -> Array<Span<felt252>>;
+    fn __validate__(calls: Array<Call>) -> felt252;
+    fn is_valid_signature(hash: felt252, signature: Array<felt252>) -> u32;
+}
