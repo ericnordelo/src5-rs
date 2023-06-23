@@ -1,3 +1,5 @@
+use starknet::ContractAddress;
+
 struct Call {
     to: ContractAddress,
     selector: felt252,
