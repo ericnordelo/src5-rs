@@ -2,7 +2,7 @@
 name = "src5-rs"
 description = "Utility for generating SRC5 interfaces ids from Cairo traits"
 homepage = "https://github.com/ericnordelo/src5-rs"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 license = "MIT"
 readme = "README.md"
