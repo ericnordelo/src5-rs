@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate prettytable;
+
 mod cli;
 mod commands;
 

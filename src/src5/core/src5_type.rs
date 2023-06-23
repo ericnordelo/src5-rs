@@ -1,8 +1,7 @@
-use std::collections::HashMap;
-
 // Module for computing SRC5 compliant types
 use cairo_lang_compiler::db::RootDatabase;
 use cairo_lang_syntax::node::{kind::SyntaxKind, SyntaxNode};
+use std::collections::HashMap;
 
 use crate::parser::{
     cairo_base_type::get_cairo_base_type_from_name, cairo_enum::CairoEnum,
