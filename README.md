@@ -12,11 +12,11 @@ Utility for generating SRC5 interfaces ids from Cairo traits, using Cairo source
 
 * Install the rust toolchain in order to have cargo installed by following
   [this](https://www.rust-lang.org/tools/install) guide.
-* run `cargo install src5`
+* run `cargo install src5-rs`
 
 ## Usage
 
-Run `src5 parse <PATH_TO_CAIRO_FILE>` for generating the interface ids for all the non-generic traits in the file.
+Run `src5_rs parse <PATH_TO_CAIRO_FILE>` for generating the interface ids for all the non-generic traits in the file.
 
 As an example, copy this code into a file in your filesystem:
 
@@ -41,7 +41,7 @@ Notice you don't need to define or import types that are defined inside corelib,
 Run the parse subcommand passing the path to the file as parameter:
 
 ```
-src5 parse path/to/the/file
+src5_rs parse path/to/the/file
 ```
 
 You should see the following output in the terminal:
