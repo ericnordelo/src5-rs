@@ -1,6 +1,6 @@
 # src5-rs
 
-[![Crates.io](https://img.shields.io/crates/v/blockchain-keygen.svg)](https://crates.io/crates/blockchain-keygen)
+[![Crates.io](https://img.shields.io/crates/v/src5-rs.svg)](https://crates.io/crates/src5-rs)
 
 ## Overview
 
