@@ -1,6 +1,10 @@
-# blockchain-keygen
+# src5-rs
 
 [![Crates.io](https://img.shields.io/crates/v/blockchain-keygen.svg)](https://crates.io/crates/blockchain-keygen)
+
+## Overview
+
+Utility for generating SRC5 interfaces ids from Cairo traits, using Cairo source code as input.
 
 ## Installation
 
@@ -46,4 +50,4 @@ You should see the following output in the terminal:
 
 ## License
 
-Licensed under the MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+Licensed under the MIT license.
