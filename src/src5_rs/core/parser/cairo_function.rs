@@ -42,7 +42,9 @@ impl CairoNonGenericFunction {
             efs_signature.push_str(&input.get_src5_type(db, cairo_structs, cairo_enums)?);
             efs_signature.push(',');
         }
-        efs_signature.pop(); // Remove last comma
+        if efs_signature.ends_with(',') {
+            efs_signature.pop(); // Remove last comma
+        }
         efs_signature.push(')');
 
         // Resolve return type
