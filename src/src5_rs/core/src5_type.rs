@@ -1,5 +1,5 @@
 // Module for computing SRC5 compliant types
-use anyhow::{Result, Ok, bail};
+use anyhow::{bail, Ok, Result};
 use cairo_lang_compiler::db::RootDatabase;
 use cairo_lang_syntax::node::{kind::SyntaxKind, SyntaxNode};
 use std::collections::HashMap;
@@ -118,8 +118,13 @@ fn get_src5_type_from_expr_path_node(
             src5_type.push('(');
             // Resolve each member type
             for ty in struct_type.members_types.iter() {
-                let src5_type_for_ty =
-                    get_src5_type_from_type_clause_nodes_kind(db, ty, structs, enums, replacements)?;
+                let src5_type_for_ty = get_src5_type_from_type_clause_nodes_kind(
+                    db,
+                    ty,
+                    structs,
+                    enums,
+                    replacements,
+                )?;
                 src5_type.push_str(&src5_type_for_ty);
                 src5_type.push(',');
             }
@@ -133,8 +138,13 @@ fn get_src5_type_from_expr_path_node(
             src5_type.push_str("E(");
             // Resolve each member type
             for ty in enum_type.variants_types.iter() {
-                let src5_type_for_ty =
-                    get_src5_type_from_type_clause_nodes_kind(db, ty, structs, enums, replacements)?;
+                let src5_type_for_ty = get_src5_type_from_type_clause_nodes_kind(
+                    db,
+                    ty,
+                    structs,
+                    enums,
+                    replacements,
+                )?;
                 src5_type.push_str(&src5_type_for_ty);
                 src5_type.push(',');
             }

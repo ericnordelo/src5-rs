@@ -1,4 +1,4 @@
-use anyhow::{Result, Ok};
+use anyhow::{Ok, Result};
 // Module for handling Cairo functions
 use cairo_lang_compiler::db::RootDatabase;
 use cairo_lang_syntax::node::kind::SyntaxKind;

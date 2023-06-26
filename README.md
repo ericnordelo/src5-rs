@@ -21,12 +21,6 @@ Run `src5_rs parse <PATH_TO_CAIRO_FILE>` for generating the interface ids for al
 As an example, copy this code into a file in your filesystem:
 
 ```
-struct Call {
-    to: ContractAddress,
-    selector: felt252,
-    calldata: Array<felt252>
-}
-
 trait IAccount {
     fn __execute__(calls: Array<Call>) -> Array<Span<felt252>>;
     fn __validate__(calls: Array<Call>) -> felt252;
