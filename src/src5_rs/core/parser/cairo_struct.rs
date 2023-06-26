@@ -68,6 +68,51 @@ pub fn get_cairo_structs_no_corelib(
 
 const CORELIB_STRUCTS: &str = "
 struct Span<T> {
-   snapshot: @Array<T>
+    snapshot: @Array<T>
+}
+struct Call {
+    to: ContractAddress,
+    selector: felt252,
+    calldata: Array<felt252>
+}
+struct EthAddress {
+    address: felt252,
+}
+struct ExecutionInfo {
+    block_info: Box<BlockInfo>,
+    tx_info: Box<TxInfo>,
+    caller_address: ContractAddress,
+    contract_address: ContractAddress,
+    entry_point_selector: felt252,
+}
+struct BlockInfo {
+    block_number: u64,
+    block_timestamp: u64,
+    sequencer_address: ContractAddress,
+}
+struct TxInfo {
+    version: felt252,
+    account_contract_address: ContractAddress,
+    max_fee: u128,
+    signature: Span<felt252>,
+    transaction_hash: felt252,
+    chain_id: felt252,
+    nonce: felt252,
+}
+struct u256 {
+    low: u128,
+    high: u128,
+}
+struct u512 {
+    limb0: u128,
+    limb1: u128,
+    limb2: u128,
+    limb3: u128,
+}
+struct Panic {}
+struct PoseidonBuiltinState {
+    s0: felt252,
+    s1: felt252,
+    s2: felt252,
 }
 ";
