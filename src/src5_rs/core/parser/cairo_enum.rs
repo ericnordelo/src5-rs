@@ -68,4 +68,29 @@ enum bool {
     True: (),
     False: (),
 }
+enum U128sFromFelt252Result {
+    Narrow: u128,
+    Wide: (u128, u128),
+}
+enum never {}
+enum FromNullableResult<T> {
+    Null: (),
+    NotNull: Box<T>,
+}
+enum Option<T> {
+    Some: T,
+    None: (),
+}
+enum PanicResult<T> {
+    Ok: T,
+    Err: (Panic, Array<felt252>),
+}
+enum Result<T, E> {
+    Ok: T,
+    Err: E,
+}
+enum IsZeroResult<T> {
+    Zero: (),
+    NonZero: NonZero<T>,
+}
 ";
