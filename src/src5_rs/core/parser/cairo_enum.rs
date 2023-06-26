@@ -33,7 +33,8 @@ fn get_cairo_enums_no_corelib(db: &RootDatabase, syntax_tree: &SyntaxNode) -> Ve
         if SyntaxKind::ItemEnum == node.kind(db) {
             // Look up the Enum name
             let id_node = find_children(db, &node, SyntaxKind::TerminalIdentifier).unwrap();
-            let struct_name = id_node.get_text_without_trivia(db);
+            let enum_name = id_node.get_text_without_trivia(db);
+
             let mut struct_members_types = Vec::new();
             let mut struct_generics = Vec::new();
 
@@ -54,7 +55,7 @@ fn get_cairo_enums_no_corelib(db: &RootDatabase, syntax_tree: &SyntaxNode) -> Ve
                 }
             }
             cairo_enums.push(CairoEnum {
-                name: struct_name,
+                name: enum_name,
                 generics: struct_generics,
                 variants_types: struct_members_types,
             });

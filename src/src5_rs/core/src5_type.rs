@@ -1,4 +1,5 @@
 // Module for computing SRC5 compliant types
+use anyhow::{Result, Ok, bail};
 use cairo_lang_compiler::db::RootDatabase;
 use cairo_lang_syntax::node::{kind::SyntaxKind, SyntaxNode};
 use std::collections::HashMap;
@@ -14,7 +15,7 @@ pub trait SRC5Typed {
         db: &RootDatabase,
         cairo_structs: &[CairoStruct],
         cairo_enums: &[CairoEnum],
-    ) -> String;
+    ) -> Result<String>;
 }
 
 impl SRC5Typed for SyntaxNode {
@@ -23,7 +24,7 @@ impl SRC5Typed for SyntaxNode {
         db: &RootDatabase,
         cairo_structs: &[CairoStruct],
         cairo_enums: &[CairoEnum],
-    ) -> String {
+    ) -> Result<String> {
         let replacements = &mut HashMap::new();
         match self.kind(db) {
             SyntaxKind::TypeClause | SyntaxKind::ReturnTypeClause => {
@@ -36,7 +37,7 @@ impl SRC5Typed for SyntaxNode {
                 )
             }
             _ => {
-                panic!("Node is not a Type Clause");
+                bail!("Node is not a Type Clause");
             }
         }
     }
@@ -49,7 +50,7 @@ fn get_src5_type_from_type_clause_nodes_kind(
     cairo_structs: &[CairoStruct],
     cairo_enums: &[CairoEnum],
     replacements: &mut HashMap<String, String>,
-) -> String {
+) -> Result<String> {
     let mut src5_type = String::new();
 
     // Handle Unary expressions
@@ -60,8 +61,8 @@ fn get_src5_type_from_type_clause_nodes_kind(
             cairo_structs,
             cairo_enums,
             replacements,
-        ));
-        src5_type
+        )?);
+        Ok(src5_type)
     }
     // Handle Tuple expressions
     else if let Some(expr_tuple) = find_children(db, node, SyntaxKind::ExprTuple) {
@@ -71,8 +72,8 @@ fn get_src5_type_from_type_clause_nodes_kind(
             cairo_structs,
             cairo_enums,
             replacements,
-        ));
-        src5_type
+        )?);
+        Ok(src5_type)
     }
     // Handle Path expressions
     else if let Some(expr_path) = find_children(db, node, SyntaxKind::ExprPath) {
@@ -82,10 +83,10 @@ fn get_src5_type_from_type_clause_nodes_kind(
             cairo_structs,
             cairo_enums,
             replacements,
-        ));
-        src5_type
+        )?);
+        Ok(src5_type)
     } else {
-        panic!("Unexpected Type node kind: {:?}", node.kind(db));
+        bail!("Unexpected Type node kind: {:?}", node.kind(db));
     }
 }
 
@@ -97,7 +98,7 @@ fn get_src5_type_from_expr_path_node(
     structs: &[CairoStruct],
     enums: &[CairoEnum],
     replacements: &mut HashMap<String, String>,
-) -> String {
+) -> Result<String> {
     let mut src5_type = String::new();
 
     // Handle no generics type
@@ -118,7 +119,7 @@ fn get_src5_type_from_expr_path_node(
             // Resolve each member type
             for ty in struct_type.members_types.iter() {
                 let src5_type_for_ty =
-                    get_src5_type_from_type_clause_nodes_kind(db, ty, structs, enums, replacements);
+                    get_src5_type_from_type_clause_nodes_kind(db, ty, structs, enums, replacements)?;
                 src5_type.push_str(&src5_type_for_ty);
                 src5_type.push(',');
             }
@@ -133,7 +134,7 @@ fn get_src5_type_from_expr_path_node(
             // Resolve each member type
             for ty in enum_type.variants_types.iter() {
                 let src5_type_for_ty =
-                    get_src5_type_from_type_clause_nodes_kind(db, ty, structs, enums, replacements);
+                    get_src5_type_from_type_clause_nodes_kind(db, ty, structs, enums, replacements)?;
                 src5_type.push_str(&src5_type_for_ty);
                 src5_type.push(',');
             }
@@ -142,7 +143,7 @@ fn get_src5_type_from_expr_path_node(
             }
             src5_type.push(')');
         } else {
-            panic!("Unexpected Cairo type: {}", name);
+            bail!("Unexpected Cairo type: {}", name);
         }
     }
     // Handle type with generics
@@ -171,7 +172,7 @@ fn get_src5_type_from_expr_path_node(
                         structs,
                         enums,
                         replacements,
-                    );
+                    )?;
                     src5_type.push_str(&src5_type_for_generic_arg);
                     src5_type.push(',');
                 }
@@ -190,7 +191,7 @@ fn get_src5_type_from_expr_path_node(
             let generic_args_list =
                 find_children(db, &generic_args_node, SyntaxKind::GenericArgList).unwrap();
             let new_replacements = &mut HashMap::new();
-            let generic_index = 0;
+            let mut generic_index = 0;
             for node in generic_args_list.children(db) {
                 if node.kind(db) == SyntaxKind::GenericArgExpr {
                     let src5_type_for_generic_arg = get_src5_type_from_type_clause_nodes_kind(
@@ -199,11 +200,12 @@ fn get_src5_type_from_expr_path_node(
                         structs,
                         enums,
                         replacements,
-                    );
+                    )?;
                     new_replacements.insert(
                         struct_type.generics[generic_index].clone(),
                         src5_type_for_generic_arg,
                     );
+                    generic_index += 1;
                 }
             }
             // Resolve each member type with replacements
@@ -214,7 +216,50 @@ fn get_src5_type_from_expr_path_node(
                     structs,
                     enums,
                     new_replacements,
-                );
+                )?;
+                src5_type.push_str(&src5_type_for_ty);
+                src5_type.push(',');
+            }
+            if src5_type.ends_with(',') {
+                src5_type.pop(); // Remove last comma
+            }
+            src5_type.push(')');
+        }
+        // Handle enum types
+        else if let Some(enum_type) = get_cairo_enum_from_name(&name, enums) {
+            src5_type.push_str("E(");
+            // Resolve each generic type first
+            let generic_args_node =
+                find_children(db, &path_segment_generics, SyntaxKind::GenericArgs).unwrap();
+            let generic_args_list =
+                find_children(db, &generic_args_node, SyntaxKind::GenericArgList).unwrap();
+            let new_replacements = &mut HashMap::new();
+            let mut generic_index = 0;
+            for node in generic_args_list.children(db) {
+                if node.kind(db) == SyntaxKind::GenericArgExpr {
+                    let src5_type_for_generic_arg = get_src5_type_from_type_clause_nodes_kind(
+                        db,
+                        &node,
+                        structs,
+                        enums,
+                        replacements,
+                    )?;
+                    new_replacements.insert(
+                        enum_type.generics[generic_index].clone(),
+                        src5_type_for_generic_arg,
+                    );
+                    generic_index += 1;
+                }
+            }
+            // Resolve each variant type with replacements
+            for ty in enum_type.variants_types.iter() {
+                let src5_type_for_ty = get_src5_type_from_type_clause_nodes_kind(
+                    db,
+                    ty,
+                    structs,
+                    enums,
+                    new_replacements,
+                )?;
                 src5_type.push_str(&src5_type_for_ty);
                 src5_type.push(',');
             }
@@ -223,12 +268,12 @@ fn get_src5_type_from_expr_path_node(
             }
             src5_type.push(')');
         } else {
-            panic!("Unexpected Cairo type: {}", name);
+            bail!("Unexpected Cairo type: {}", name);
         }
     } else {
-        panic!("Unexpected node kind");
+        bail!("Unexpected node kind");
     }
-    src5_type
+    Ok(src5_type)
 }
 
 fn get_src5_type_from_expr_tuple_node(
@@ -237,7 +282,7 @@ fn get_src5_type_from_expr_tuple_node(
     cairo_structs: &[CairoStruct],
     cairo_enums: &[CairoEnum],
     replacements: &mut HashMap<String, String>,
-) -> String {
+) -> Result<String> {
     let mut src5_type = String::new();
     let expr_list = find_children(db, tuple_node, SyntaxKind::ExprList).unwrap();
     src5_type.push('(');
@@ -250,7 +295,7 @@ fn get_src5_type_from_expr_tuple_node(
                     cairo_structs,
                     cairo_enums,
                     replacements,
-                );
+                )?;
                 src5_type.push_str(&src5_type_for_ty);
                 src5_type.push(',');
             }
@@ -261,7 +306,7 @@ fn get_src5_type_from_expr_tuple_node(
                     cairo_structs,
                     cairo_enums,
                     replacements,
-                );
+                )?;
                 src5_type.push_str(&src5_type_for_ty);
                 src5_type.push(',');
             }
@@ -272,7 +317,7 @@ fn get_src5_type_from_expr_tuple_node(
                     cairo_structs,
                     cairo_enums,
                     replacements,
-                );
+                )?;
                 src5_type.push_str(&src5_type_for_ty);
                 src5_type.push(',');
             }
@@ -283,7 +328,7 @@ fn get_src5_type_from_expr_tuple_node(
         src5_type.pop(); // Remove last comma
     }
     src5_type.push(')');
-    src5_type
+    Ok(src5_type)
 }
 
 fn get_src5_type_from_expr_unary_node(
@@ -292,7 +337,7 @@ fn get_src5_type_from_expr_unary_node(
     cairo_structs: &[CairoStruct],
     cairo_enums: &[CairoEnum],
     replacements: &mut HashMap<String, String>,
-) -> String {
+) -> Result<String> {
     let mut src5_type = String::new();
     let leading_type_node = find_children(db, unary_node, SyntaxKind::TerminalAt).unwrap();
     src5_type.push_str(&leading_type_node.get_text_without_trivia(db));
@@ -305,7 +350,7 @@ fn get_src5_type_from_expr_unary_node(
             cairo_structs,
             cairo_enums,
             replacements,
-        ));
+        )?);
     }
     // Handle Tuple expressions
     else if let Some(expr_tuple) = find_children(db, unary_node, SyntaxKind::ExprTuple) {
@@ -315,7 +360,7 @@ fn get_src5_type_from_expr_unary_node(
             cairo_structs,
             cairo_enums,
             replacements,
-        ));
+        )?);
     }
     // Handle Unary expressions
     else if let Some(expr_unary) = find_children(db, unary_node, SyntaxKind::ExprUnary) {
@@ -325,11 +370,11 @@ fn get_src5_type_from_expr_unary_node(
             cairo_structs,
             cairo_enums,
             replacements,
-        ));
+        )?);
     } else {
-        panic!("Unexpected Expr node kind: {:?}", unary_node.kind(db));
+        bail!("Unexpected Expr node kind: {:?}", unary_node.kind(db));
     }
-    src5_type
+    Ok(src5_type)
 }
 
 fn get_cairo_struct_from_name<'a>(

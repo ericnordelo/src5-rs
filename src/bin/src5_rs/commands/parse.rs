@@ -46,7 +46,7 @@ impl CliCommand for Parse {
             let mut interface_id = BigUint::from(0u8);
             trait_table.add_row(row![bFg->cairo_trait.name]);
             for function in &cairo_trait.functions {
-                let signature = function.get_efs_signature(&db, &cairo_structs, &cairo_enums);
+                let signature = function.get_efs_signature(&db, &cairo_structs, &cairo_enums)?;
                 let selector = get_selector_from_signature(&signature);
                 interface_id ^= selector.clone();
                 trait_table.add_row(row![signature, format!("0x{:x}", selector)]);

@@ -1,3 +1,4 @@
+use anyhow::{Result, Ok};
 // Module for handling Cairo functions
 use cairo_lang_compiler::db::RootDatabase;
 use cairo_lang_syntax::node::kind::SyntaxKind;
@@ -34,11 +35,11 @@ impl CairoNonGenericFunction {
         db: &RootDatabase,
         cairo_structs: &[CairoStruct],
         cairo_enums: &[CairoEnum],
-    ) -> String {
+    ) -> Result<String> {
         let mut efs_signature = format!("{}(", self.name);
         // Resolve each member type
         for input in self.inputs_types.iter() {
-            efs_signature.push_str(&input.get_src5_type(db, cairo_structs, cairo_enums));
+            efs_signature.push_str(&input.get_src5_type(db, cairo_structs, cairo_enums)?);
             efs_signature.push(',');
         }
         efs_signature.pop(); // Remove last comma
@@ -47,9 +48,9 @@ impl CairoNonGenericFunction {
         // Resolve return type
         if let Some(return_type) = &self.return_type {
             efs_signature.push_str("->");
-            efs_signature.push_str(&return_type.get_src5_type(db, cairo_structs, cairo_enums));
+            efs_signature.push_str(&return_type.get_src5_type(db, cairo_structs, cairo_enums)?);
         }
-        efs_signature
+        Ok(efs_signature)
     }
 }
 
