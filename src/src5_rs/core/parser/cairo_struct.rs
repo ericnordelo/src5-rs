@@ -73,7 +73,7 @@ struct Span<T> {
 struct Call {
     to: ContractAddress,
     selector: felt252,
-    calldata: Array<felt252>
+    calldata: Span<felt252>
 }
 struct EthAddress {
     address: felt252,
@@ -114,5 +114,10 @@ struct PoseidonBuiltinState {
     s0: felt252,
     s1: felt252,
     s2: felt252,
+}
+struct ByteArray {
+    data: Array<bytes31>,
+    pending_word: felt252,
+    pending_word_len: usize,
 }
 ";

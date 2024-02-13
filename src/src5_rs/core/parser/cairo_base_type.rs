@@ -6,8 +6,12 @@ pub struct CairoBaseType {
     pub generics: Vec<String>,
 }
 
-pub fn get_cairo_base_types() -> [CairoBaseType; 39] {
+pub fn get_cairo_base_types() -> [CairoBaseType; 40] {
     [
+        CairoBaseType {
+            name: "bytes31".into(),
+            generics: Vec::new(),
+        },
         CairoBaseType {
             name: "felt252".into(),
             generics: Vec::new(),
