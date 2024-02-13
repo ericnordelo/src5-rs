@@ -9,6 +9,9 @@ readme = "README.md"
 repository = "https://github.com/ericnordelo/src5-rs"
 keywords = ["cairo", "interface", "src5", "erc165", "introspection"]
 categories = ["command-line-utilities"]
+exclude = [
+    "images/*",
+]
 
 [lib]
 name = "src5_rs"
